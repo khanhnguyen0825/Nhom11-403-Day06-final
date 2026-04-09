@@ -1,5 +1,6 @@
 # Dành cho Agent/Thành viên: Leader / Project Manager
-# Lịch sử commit gợi ý: "feat: integrate AI triage and Streamlit UI for Demo"
+
+# Lịch sử commit gợi ý:"feat: integrate AI triage & Streamlit UI for Demo"
 
 import streamlit as st
 import time

@@ -80,9 +80,8 @@ def render_happy_path(data):
         st.caption(f"Độ tự tin của AI: {data.get('confidence_score', 0) * 100}%")
         st.write(f"**Lý do:** {data.get('giai_thich_ngan')}")
 
-        # Chỉ hiển thị bản đồ nếu AI xác nhận đây là yêu cầu chỉ đường (yeu_cau_chi_duong = True)
-        if data.get("yeu_cau_chi_duong"):
-            render_map_image(chuyen_khoa)
+        # Luôn hiển thị sơ đồ đường đi tới chuyên khoa đã được đề xuất
+        render_map_image(chuyen_khoa)
 
         col1, col2 = st.columns(2)
         with col1:
