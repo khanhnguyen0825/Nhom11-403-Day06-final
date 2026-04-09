@@ -195,6 +195,8 @@ if "pending_draft_text" not in st.session_state:
     st.session_state.pending_draft_text = None
 if "last_audio_sig" not in st.session_state:
     st.session_state.last_audio_sig = None
+if "is_correcting" not in st.session_state:
+    st.session_state.is_correcting = False
 
 if st.session_state.pending_draft_text is not None:
     st.session_state.draft_input = st.session_state.pending_draft_text
@@ -204,9 +206,12 @@ if st.session_state.pending_draft_text is not None:
 def submit_prompt_from_input(show_warning=False):
     candidate = st.session_state.draft_input.strip()
     if candidate:
-        # Kiểm tra nếu AI đang ở trạng thái UNKNOWN/Uncertain thì đính kèm ngữ cảnh
-        # để AI hiểu đây là câu trả lời bổ sung, KHÔNG phải yêu cầu mới
-        if st.session_state.messages:
+        # Ưu tiên 1: Người dùng vừa bấm nút "Kết quả sai" -> đây là đính chính
+        if st.session_state.get("is_correcting"):
+            candidate = f"(Đính chính lại triệu chứng, vui lòng bỏ qua kết quả trước) {candidate}"
+            st.session_state.is_correcting = False
+        # Ưu tiên 2: AI đang hỏi thêm (Uncertain) -> đây là trả lời bổ sung
+        elif st.session_state.messages:
             last_msg = st.session_state.messages[-1]
             if last_msg["role"] == "assistant":
                 try:

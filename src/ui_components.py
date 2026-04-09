@@ -42,7 +42,6 @@ def render_emergency_path(data):
     )
     if st.button("GỌI CẤP CỨU VINMEC (115) NGAY", type="primary", width="stretch"):
         st.error("Đang kết nối tổng đài cấp cứu...")
-    st.warning("Hệ thống AI đã tạm khóa luồng tư vấn thông thường để bảo đảm an toàn.")
 
 
 def render_uncertain_path(data):
@@ -89,7 +88,8 @@ def render_happy_path(data):
                 st.success("Ghi nhận lịch hẹn!")
         with col2:
             if st.button("Kết quả sai? Sửa triệu chứng", width="stretch"):
-                st.info("Vui lòng gõ bổ sung đính chính vào ô chat bên dưới!")
+                st.session_state.is_correcting = True
+                st.info("Vui lòng mô tả lại hoặc bổ sung đính chính triệu chứng vào ô chat bên dưới!")
 
 
 def render_refuse_path(msg):
