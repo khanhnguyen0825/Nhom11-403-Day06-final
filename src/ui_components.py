@@ -15,7 +15,9 @@ MAP_MAPPING = {
 def render_map_image(chuyen_khoa):
     """Hiển thị bản đồ chỉ đường dựa trên chuyên khoa"""
     if chuyen_khoa in ["KHÁM TỔNG QUÁT", "QUẦY LỄ TÂN"]:
-        st.info("**Gợi ý:** Để được hỗ trợ chính xác nhất cho triệu chứng này, mời bạn di chuyển đến **Sảnh chính Tầng 1 (Quầy Lễ Tân)** để nhân viên y tế hướng dẫn trực tiếp.")
+        st.info(
+            "**Gợi ý:** Để được hỗ trợ chính xác nhất cho triệu chứng này, mời bạn di chuyển đến **Sảnh chính Tầng 1 (Quầy Lễ Tân)** để nhân viên y tế hướng dẫn trực tiếp."
+        )
         return
 
     file_name = MAP_MAPPING.get(chuyen_khoa)
@@ -38,9 +40,7 @@ def render_emergency_path(data):
     st.write(
         data.get("giai_thich_ngan", "Dấu hiệu y tế khẩn cấp, vui lòng không chờ đợi!")
     )
-    if st.button(
-        "GỌI CẤP CỨU VINMEC (115) NGAY", type="primary", width="stretch"
-    ):
+    if st.button("GỌI CẤP CỨU VINMEC (115) NGAY", type="primary", width="stretch"):
         st.error("Đang kết nối tổng đài cấp cứu...")
     st.warning("Hệ thống AI đã tạm khóa luồng tư vấn thông thường để bảo đảm an toàn.")
 
@@ -64,9 +64,11 @@ def render_happy_path(data):
     chuyen_khoa = data.get("chuyen_khoa")
 
     if chuyen_khoa == "QUẦY LỄ TÂN":
-        st.info("**Hướng dẫn phân luồng:** Vui lòng tới Quầy Lễ Tân để được hỗ trợ trực tiếp.")
-        st.write(f"**Lý do:** {data.get('giai_thich_ngan')}")
-        
+        st.info(
+            "**Hướng dẫn phân luồng:** Vui lòng tới Quầy Lễ Tân để được hỗ trợ trực tiếp."
+        )
+        st.write(f"**Lý do :** {data.get('giai_thich_ngan')}")
+
         if st.button("Đã hiểu / Quay lại", width="stretch"):
             st.info("Vui lòng gõ vào ô chat để bắt đầu một hội thoại mới.")
     else:
