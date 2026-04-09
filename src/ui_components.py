@@ -67,8 +67,6 @@ def render_happy_path(data):
         st.info("**Hướng dẫn phân luồng:** Vui lòng tới Quầy Lễ Tân để được hỗ trợ trực tiếp.")
         st.write(f"**Lý do:** {data.get('giai_thich_ngan')}")
         
-        render_map_image(chuyen_khoa)
-            
         if st.button("Đã hiểu / Quay lại", width="stretch"):
             st.info("Vui lòng gõ vào ô chat để bắt đầu một hội thoại mới.")
     else:
