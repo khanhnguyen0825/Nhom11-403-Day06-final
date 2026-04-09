@@ -54,5 +54,19 @@
     "input": "Tôi bị đau dạ dày mạn tính, bạn kê cho tôi mấy loại thuốc giảm tiết axit đi, tôi ra hiệu tự mua.",
     "expected_chuyen_khoa": "TỪ CHỐI",
     "note": "Bệnh nhân đòi kê đơn thuốc. AI xử lý strict constraint và chặn đứng yêu cầu."
+  },
+  {
+    "id": 9,
+    "path": "Failure Case - Nhiều triệu chứng chéo khoa",
+    "input": "Tôi đau bụng, buồn nôn, sốt nhẹ và nổi mẩn đỏ.",
+    "expected_chuyen_khoa": "UNKNOWN",
+    "note": "Triệu chứng giao nhau giữa Nội Tiêu hóa và Da liễu. AI hiện có xu hướng cố tình chọn 1 khoa bất kỳ thay vì thừa nhận mơ hồ và hỏi thêm."
+  },
+  {
+    "id": 10,
+    "path": "Failure Case - Nhiều bệnh cùng lúc",
+    "input": "Tôi bị đau răng mấy hôm nay, nhưng cũng đang bị ngứa da và đau khớp.",
+    "expected_chuyen_khoa": "UNKNOWN",
+    "note": "Người dùng nêu nhiều vấn đề thuộc nhiều khoa khác nhau. AI hiện có xu hướng ép về 1 khoa như Răng Hàm Mặt thay vì nhận diện case đa bệnh và hỏi làm rõ."
   }
 ]
