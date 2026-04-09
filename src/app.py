@@ -231,8 +231,12 @@ def submit_prompt_from_input(show_warning=False):
 
 
 for idx, msg in enumerate(st.session_state.messages):
-    with st.chat_message(msg["role"]):
-        # Chỉ render giao diện rich UI (như nút bấm, form chọn) cho câu hỏi Bác Sĩ cuối cùng
+    # Dùng icon 🩺 cho AI và 👤 cho người dùng
+    avatar_icon = "🩺" if msg["role"] == "assistant" else "👤"
+
+    with st.chat_message(
+        msg["role"], avatar=avatar_icon
+    ):  # Chỉ render giao diện rich UI (như nút bấm, form chọn) cho câu hỏi Bác Sĩ cuối cùng
         if msg["role"] == "assistant" and idx == len(st.session_state.messages) - 1:
             try:
                 data = json.loads(msg["content"])
@@ -325,7 +329,7 @@ if (
         with st.chat_message("user"):
             st.markdown(submitted_input)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🩺"):
         with st.spinner("AI đang phân tích triệu chứng..."):
             result = get_triage_result(st.session_state.messages)
             time.sleep(1)  # Fake loading
