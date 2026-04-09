@@ -204,6 +204,19 @@ if st.session_state.pending_draft_text is not None:
 def submit_prompt_from_input(show_warning=False):
     candidate = st.session_state.draft_input.strip()
     if candidate:
+        # Kiểm tra nếu AI đang ở trạng thái UNKNOWN/Uncertain thì đính kèm ngữ cảnh
+        # để AI hiểu đây là câu trả lời bổ sung, KHÔNG phải yêu cầu mới
+        if st.session_state.messages:
+            last_msg = st.session_state.messages[-1]
+            if last_msg["role"] == "assistant":
+                try:
+                    last_data = json.loads(last_msg["content"])
+                    last_khoa = last_data.get("chuyen_khoa")
+                    last_conf = float(last_data.get("confidence_score", 0))
+                    if last_khoa == "UNKNOWN" or last_conf < 0.7:
+                        candidate = f"(Bổ sung triệu chứng cho câu hỏi trước) {candidate}"
+                except:
+                    pass
         st.session_state.messages.append({"role": "user", "content": candidate})
         st.session_state.pending_draft_text = ""
         return candidate
@@ -236,21 +249,22 @@ for idx, msg in enumerate(st.session_state.messages):
                     options = data.get("cac_lua_chon_goi_y", [])
                     if options:
                         with st.form(key=f"symptom_form_{idx}"):
-                            selected = st.multiselect(
-                                "Vui lòng đánh dấu các triệu chứng có liên quan:",
-                                options,
+                            selected = st.multiselect("Vui lòng đánh dấu các triệu chứng có liên quan:", options)
+                            custom_input = st.text_input(
+                                "Hoặc mô tả thêm triệu chứng khác (nếu có):",
+                                placeholder="Ví dụ: đau lan xuống đùi, buồn nôn sau ăn...",
                             )
                             if st.form_submit_button("Gửi lựa chọn", type="primary"):
+                                parts = []
                                 if selected:
-                                    ans = (
-                                        "Tôi gặp các triệu chứng bổ sung: "
-                                        + ", ".join(selected)
-                                    )
-                                else:
+                                    parts.append("Tôi gặp các triệu chứng bổ sung: " + ", ".join(selected))
+                                if custom_input.strip():
+                                    parts.append("Ngoài ra tôi còn: " + custom_input.strip())
+                                if not parts:
                                     ans = "Tôi không gặp triệu chứng nào ở trên."
-                                st.session_state.messages.append(
-                                    {"role": "user", "content": ans}
-                                )
+                                else:
+                                    ans = ". ".join(parts)
+                                st.session_state.messages.append({"role": "user", "content": ans})
                                 st.rerun()
                 else:
                     render_happy_path(data)
