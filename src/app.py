@@ -6,17 +6,18 @@ import time
 import json
 from ai_engine import get_triage_result, transcribe_audio_bytes
 from ui_components import (
-    render_emergency_path, 
-    render_uncertain_path, 
-    render_happy_path, 
-    render_error, 
+    render_emergency_path,
+    render_uncertain_path,
+    render_happy_path,
+    render_error,
     render_refuse_path,
-    render_right_sidebar
+    render_right_sidebar,
 )
 
 st.set_page_config(page_title="V-Triage AI", layout="centered")
 
-st.markdown("""
+st.markdown(
+    """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -25,11 +26,7 @@ html, body, [class*="css"] {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* ── Page background ── */
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%) !important;
-    min-height: 100vh;
-}
+/* ── Xóa background cứng để Streamlit tự quản lý Light/Dark Mode ── */
 [data-testid="stHeader"] {
     background: transparent !important;
 }
@@ -45,7 +42,8 @@ html, body, [class*="css"] {
 h1 {
     font-size: 1.8rem !important;
     font-weight: 800 !important;
-    background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6) !important;
+    /* Dùng dải màu gradient đậm hơn một chút để nổi bật trên cả nền Trắng và Đen */
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
@@ -53,14 +51,15 @@ h1 {
     margin-bottom: 4px !important;
 }
 [data-testid="stMarkdown"] em {
-    color: #6b7280 !important;
+    color: var(--text-color) !important;
+    opacity: 0.7;
     font-size: 0.82rem !important;
 }
 
 /* ── Divider ── */
 hr {
     border: none !important;
-    border-top: 1px solid rgba(255,255,255,0.07) !important;
+    border-top: 1px solid rgba(128, 128, 128, 0.2) !important;
     margin: 12px 0 !important;
 }
 
@@ -69,13 +68,14 @@ hr {
     border-radius: 16px !important;
     padding: 14px 18px !important;
     margin-bottom: 10px !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(128, 128, 128, 0.15) !important;
 }
 [data-testid="stChatMessage"][data-testid*="user"] {
-    background: rgba(96, 165, 250, 0.08) !important;
+    /* Dùng màu phụ của Streamlit để đổi màu linh hoạt */
+    background: var(--secondary-background-color) !important; 
 }
 [data-testid="stChatMessage"][data-testid*="assistant"] {
-    background: rgba(255,255,255,0.03) !important;
+    background: transparent !important;
 }
 
 /* ── Success / Warning / Error / Info banners ── */
@@ -88,10 +88,6 @@ hr {
 /* ── Progress bar ── */
 [data-testid="stProgress"] > div > div {
     background: linear-gradient(90deg, #3b82f6, #8b5cf6) !important;
-    border-radius: 99px !important;
-}
-[data-testid="stProgress"] > div {
-    background: rgba(255,255,255,0.08) !important;
     border-radius: 99px !important;
 }
 
@@ -107,6 +103,7 @@ hr {
 }
 [data-testid="stButton"] button[kind="primary"] {
     background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+    color: white !important;
     border: none !important;
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
 }
@@ -115,33 +112,21 @@ hr {
     box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important;
 }
 [data-testid="stButton"] button[kind="secondary"] {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
-    color: #d1d5db !important;
-}
-[data-testid="stButton"] button[kind="secondary"]:hover {
-    background: rgba(255,255,255,0.09) !important;
-    border-color: rgba(255,255,255,0.22) !important;
+    background: transparent !important;
+    border: 1px solid rgba(128, 128, 128, 0.3) !important;
 }
 
 /* ── Input bar: text + mic + send ── */
 div[data-testid="stTextInput"] input {
     height: 44px !important;
     min-height: 44px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
     border-radius: 12px !important;
-    color: #f3f4f6 !important;
     font-size: 0.92rem !important;
     padding: 0 16px !important;
-    transition: border-color 0.2s ease !important;
 }
 div[data-testid="stTextInput"] input:focus {
     border-color: #6366f1 !important;
     box-shadow: 0 0 0 3px rgba(99,102,241,0.18) !important;
-}
-div[data-testid="stTextInput"] input::placeholder {
-    color: #6b7280 !important;
 }
 div[data-testid="stAudioInput"],
 div[data-testid="stAudioInput"] > div,
@@ -159,25 +144,16 @@ div[data-testid="stAudioInput"] button {
     width: 44px !important;
     min-height: 44px !important;
     border-radius: 12px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
     margin: 0 !important;
     flex-shrink: 0 !important;
-    transition: all 0.2s ease !important;
-}
-div[data-testid="stAudioInput"] button:hover {
-    background: rgba(255,255,255,0.12) !important;
-    border-color: rgba(255,255,255,0.22) !important;
 }
 
 /* ── Multiselect ── */
 [data-testid="stMultiSelect"] > div {
-    background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
     border-radius: 12px !important;
 }
 
@@ -187,31 +163,24 @@ div[data-testid="stAudioInput"] button:hover {
     font-weight: 600 !important;
     height: 44px !important;
     background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+    color: white !important;
     border: none !important;
     box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
 }
 
 /* ── Spinner text ── */
 [data-testid="stSpinner"] p {
-    color: #9ca3af !important;
     font-size: 0.86rem !important;
 }
-
-/* ── Caption / small text ── */
-[data-testid="stCaptionContainer"] {
-    color: #6b7280 !important;
-    font-size: 0.78rem !important;
-}
-
-/* ── Warning / error message tweaks ── */
-.stWarning, .stError, .stSuccess, .stInfo {
-    border-radius: 12px !important;
-}
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 st.title("V-TRIAGE · TRỢ LÝ SÀNG LỌC VINMEC")
-st.markdown("*Hệ thống AI chỉ mang tính chất hỗ trợ gợi ý — không thay thế chẩn đoán của bác sĩ.*")
+st.markdown(
+    "*Hệ thống AI chỉ mang tính chất hỗ trợ gợi ý — không thay thế chẩn đoán của bác sĩ.*"
+)
 # Render right sidebar instructions
 render_right_sidebar()
 st.write("---")
@@ -241,6 +210,7 @@ def submit_prompt_from_input(show_warning=False):
         st.warning("Vui lòng nhập hoặc nói triệu chứng trước khi gửi.")
     return None
 
+
 for idx, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         # Chỉ render giao diện rich UI (như nút bấm, form chọn) cho câu hỏi Bác Sĩ cuối cùng
@@ -249,27 +219,37 @@ for idx, msg in enumerate(st.session_state.messages):
                 data = json.loads(msg["content"])
                 khoa = data.get("chuyen_khoa")
                 conf = float(data.get("confidence_score", 0))
-                
+
                 if data.get("error"):
                     st.markdown(msg.get("display"))
                 elif khoa == "EMERGENCY":
                     render_emergency_path(data)
                 elif khoa == "TỪ CHỐI":
-                    render_refuse_path(data.get("giai_thich_ngan", "Yêu cầu bị từ chối."))
+                    render_refuse_path(
+                        data.get("giai_thich_ngan", "Yêu cầu bị từ chối.")
+                    )
                 elif khoa == "UNKNOWN" or conf < 0.7:
                     render_uncertain_path(data)
-                    
+
                     # Hiện form gợi ý triệu chứng thay vì bắt user gõ
                     options = data.get("cac_lua_chon_goi_y", [])
                     if options:
                         with st.form(key=f"symptom_form_{idx}"):
-                            selected = st.multiselect("Vui lòng đánh dấu các triệu chứng có liên quan:", options)
+                            selected = st.multiselect(
+                                "Vui lòng đánh dấu các triệu chứng có liên quan:",
+                                options,
+                            )
                             if st.form_submit_button("Gửi lựa chọn", type="primary"):
                                 if selected:
-                                    ans = "Tôi gặp các triệu chứng bổ sung: " + ", ".join(selected)
+                                    ans = (
+                                        "Tôi gặp các triệu chứng bổ sung: "
+                                        + ", ".join(selected)
+                                    )
                                 else:
                                     ans = "Tôi không gặp triệu chứng nào ở trên."
-                                st.session_state.messages.append({"role": "user", "content": ans})
+                                st.session_state.messages.append(
+                                    {"role": "user", "content": ans}
+                                )
                                 st.rerun()
                 else:
                     render_happy_path(data)
@@ -315,8 +295,11 @@ if submitted:
     submitted_input = submit_prompt_from_input(show_warning=True)
 
 # Xử lý Trigger AI
-if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] == "user":
-    
+if (
+    len(st.session_state.messages) > 0
+    and st.session_state.messages[-1]["role"] == "user"
+):
+
     # Nếu tin nhắn user vừa được add qua ô nhập (chưa đc render trong vòng for), thì vẽ tạm ra
     if submitted_input:
         with st.chat_message("user"):
@@ -325,21 +308,55 @@ if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] 
     with st.chat_message("assistant"):
         with st.spinner("AI đang phân tích triệu chứng..."):
             result = get_triage_result(st.session_state.messages)
-            time.sleep(1) # Fake loading
-            
+            time.sleep(1)  # Fake loading
+
             raw_json_str = json.dumps(result, ensure_ascii=False)
-            
+
             if "error" in result:
-                st.session_state.messages.append({"role": "assistant", "content": json.dumps({"chuyen_khoa": "TỪ CHỐI", "error": result["error"]}), "display": "Lỗi: " + result["error"]})
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": json.dumps(
+                            {"chuyen_khoa": "TỪ CHỐI", "error": result["error"]}
+                        ),
+                        "display": "Lỗi: " + result["error"],
+                    }
+                )
             else:
                 khoa = result.get("chuyen_khoa")
                 if khoa == "EMERGENCY":
-                    st.session_state.messages.append({"role": "assistant", "content": raw_json_str, "display": f"**[CẢNH BÁO NGUY HIỂM]** {result.get('giai_thich_ngan', '')}"})
+                    st.session_state.messages.append(
+                        {
+                            "role": "assistant",
+                            "content": raw_json_str,
+                            "display": f"**[CẢNH BÁO NGUY HIỂM]** {result.get('giai_thich_ngan', '')}",
+                        }
+                    )
                 elif khoa == "TỪ CHỐI":
-                    st.session_state.messages.append({"role": "assistant", "content": raw_json_str, "display": f"{result.get('giai_thich_ngan', '')}"})
-                elif khoa == "UNKNOWN" or float(result.get("confidence_score", 0)) < 0.7:
-                    st.session_state.messages.append({"role": "assistant", "content": raw_json_str, "display": f"{result.get('cau_hoi_them', '')}"})
+                    st.session_state.messages.append(
+                        {
+                            "role": "assistant",
+                            "content": raw_json_str,
+                            "display": f"{result.get('giai_thich_ngan', '')}",
+                        }
+                    )
+                elif (
+                    khoa == "UNKNOWN" or float(result.get("confidence_score", 0)) < 0.7
+                ):
+                    st.session_state.messages.append(
+                        {
+                            "role": "assistant",
+                            "content": raw_json_str,
+                            "display": f"{result.get('cau_hoi_them', '')}",
+                        }
+                    )
                 else:
-                    st.session_state.messages.append({"role": "assistant", "content": raw_json_str, "display": f"Gợi ý khoa: **{khoa}** - {result.get('giai_thich_ngan', '')}"})
-            
-            st.rerun() # Refresh màn hình để kích hoạt vòng lặp vẽ rich UI ở trên cùng form checkbox
+                    st.session_state.messages.append(
+                        {
+                            "role": "assistant",
+                            "content": raw_json_str,
+                            "display": f"Gợi ý khoa: **{khoa}** - {result.get('giai_thich_ngan', '')}",
+                        }
+                    )
+
+            st.rerun()  # Refresh màn hình để kích hoạt vòng lặp vẽ rich UI ở trên cùng form checkbox

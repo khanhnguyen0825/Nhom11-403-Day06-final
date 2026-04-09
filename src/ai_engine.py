@@ -22,6 +22,7 @@ except FileNotFoundError:
 # Khởi tạo OpenAI Client (Tự động lấy OPENAI_API_KEY từ biến môi trường của dotenv)
 client = OpenAI()
 
+
 def get_triage_result(messages_list):
     try:
         api_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
@@ -29,12 +30,12 @@ def get_triage_result(messages_list):
             for msg in messages_list:
                 api_messages.append({"role": msg["role"], "content": msg["content"]})
         else:
-             api_messages.append({"role": "user", "content": messages_list})
-             
+            api_messages.append({"role": "user", "content": messages_list})
+
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=api_messages,
-            response_format={ "type": "json_object" }
+            response_format={"type": "json_object"},
         )
         return json.loads(response.choices[0].message.content)
     except Exception as e:
@@ -49,10 +50,10 @@ def transcribe_audio_bytes(audio_bytes, language_code=None):
 
         # Gọi Whisper-1 với tham số đơn giản nhất để đạt độ chính xác cao nhất
         transcript = client.audio.transcriptions.create(
-            model="whisper-1", 
-            file=audio_file, 
-            language="vi", 
-            prompt="Bác sĩ ơi, tôi bị đau đầu."
+            model="whisper-1",
+            file=audio_file,
+            language="vi",
+            prompt="Bác sĩ ơi, tôi bị đau đầu.",
         )
         return {"text": transcript.text.strip()}
     except Exception as e:

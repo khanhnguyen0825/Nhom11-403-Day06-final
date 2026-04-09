@@ -15,7 +15,9 @@ MAP_MAPPING = {
 def render_map_image(chuyen_khoa):
     """Hiển thị bản đồ chỉ đường dựa trên chuyên khoa"""
     if chuyen_khoa in ["KHÁM TỔNG QUÁT", "QUẦY LỄ TÂN"]:
-        st.info("**Gợi ý:** Để được hỗ trợ chính xác nhất cho triệu chứng này, mời bạn di chuyển đến **Sảnh chính Tầng 1 (Quầy Lễ Tân)** để nhân viên y tế hướng dẫn trực tiếp.")
+        st.info(
+            "**Gợi ý:** Để được hỗ trợ chính xác nhất cho triệu chứng này, mời bạn di chuyển đến **Sảnh chính Tầng 1 (Quầy Lễ Tân)** để nhân viên y tế hướng dẫn trực tiếp."
+        )
         return
 
     file_name = MAP_MAPPING.get(chuyen_khoa)
@@ -38,9 +40,7 @@ def render_emergency_path(data):
     st.write(
         data.get("giai_thich_ngan", "Dấu hiệu y tế khẩn cấp, vui lòng không chờ đợi!")
     )
-    if st.button(
-        "GỌI CẤP CỨU VINMEC (115) NGAY", type="primary", width="stretch"
-    ):
+    if st.button("GỌI CẤP CỨU VINMEC (115) NGAY", type="primary", width="stretch"):
         st.error("Đang kết nối tổng đài cấp cứu...")
     st.warning("Hệ thống AI đã tạm khóa luồng tư vấn thông thường để bảo đảm an toàn.")
 
@@ -64,12 +64,14 @@ def render_happy_path(data):
     chuyen_khoa = data.get("chuyen_khoa")
 
     if chuyen_khoa == "QUẦY LỄ TÂN":
-        st.info("**Hướng dẫn phân luồng:** Vui lòng tới Quầy Lễ Tân để được hỗ trợ trực tiếp.")
+        st.info(
+            "**Hướng dẫn phân luồng:** Vui lòng tới Quầy Lễ Tân để được hỗ trợ trực tiếp."
+        )
         st.write(f"**Lý do:** {data.get('giai_thich_ngan')}")
-        
+
         if data.get("yeu_cau_chi_duong"):
             render_map_image(chuyen_khoa)
-            
+
         if st.button("Đã hiểu / Quay lại", width="stretch"):
             st.info("Vui lòng gõ vào ô chat để bắt đầu một hội thoại mới.")
     else:
@@ -102,7 +104,6 @@ def render_error(error_msg):
 def render_right_sidebar():
     """Injects a custom CSS/HTML right sidebar for instructions and tips"""
 
-    # Clean string for Streamlit markdown
     html_code = (
         "<style>"
         "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');"
@@ -118,21 +119,21 @@ def render_right_sidebar():
         "}"
         ".sidebar-content-wrapper {"
         "pointer-events: auto;"
-        "background: rgba(15, 15, 26, 0.85);"
+        "background: var(--background-color);"  # Sử dụng màu nền của Streamlit
         "backdrop-filter: blur(24px) saturate(160%);"
         "-webkit-backdrop-filter: blur(24px) saturate(160%);"
-        "border: 1px solid rgba(255, 255, 255, 0.08);"
+        "border: 1px solid rgba(128, 128, 128, 0.2);"
         "border-radius: 20px;"
         "padding: 22px 18px;"
         "height: 100%;"
         "display: flex;"
         "flex-direction: column;"
-        "box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);"
+        "box-shadow: 0 10px 40px rgba(0,0,0,0.15);"
         "}"
         ".main-title {"
         "font-size: 1rem;"
         "font-weight: 700;"
-        "background: linear-gradient(90deg, #60a5fa, #a78bfa);"
+        "background: linear-gradient(90deg, #3b82f6, #8b5cf6);"
         "-webkit-background-clip: text;"
         "-webkit-text-fill-color: transparent;"
         "margin-bottom: 18px;"
@@ -143,27 +144,28 @@ def render_right_sidebar():
         ".guide-label {"
         "font-size: 0.68rem;"
         "font-weight: 600;"
-        "color: #6b7280;"
+        "color: var(--text-color);"
+        "opacity: 0.6;"
         "text-transform: uppercase;"
         "letter-spacing: 0.08em;"
         "margin-bottom: 10px;"
         "display: block;"
         "}"
         ".premium-card {"
-        "background: rgba(255,255,255,0.04);"
+        "background: var(--secondary-background-color);"  # Dùng màu phụ của Streamlit
         "border-radius: 12px;"
         "padding: 12px 14px;"
         "margin-bottom: 8px;"
-        "border: 1px solid rgba(255,255,255,0.07);"
-        "transition: transform 0.2s ease, background 0.2s ease;"
+        "border: 1px solid rgba(128, 128, 128, 0.1);"
+        "transition: transform 0.2s ease, filter 0.2s ease;"
         "}"
         ".premium-card:hover {"
         "transform: translateY(-1px);"
-        "background: rgba(255,255,255,0.07);"
+        "filter: brightness(0.95);"
         "}"
         ".card-title {"
         "font-weight: 600;"
-        "color: #e5e7eb;"
+        "color: var(--text-color);"  # Tự động đổi đen/trắng theo Theme
         "font-size: 0.82rem;"
         "margin-bottom: 4px;"
         "display: flex;"
@@ -171,7 +173,8 @@ def render_right_sidebar():
         "gap: 6px;"
         "}"
         ".card-desc {"
-        "color: #9ca3af;"
+        "color: var(--text-color);"
+        "opacity: 0.7;"
         "font-size: 0.77rem;"
         "line-height: 1.5;"
         "}"
@@ -192,8 +195,8 @@ def render_right_sidebar():
         ".marquee span {"
         "display: inline-block;"
         "padding-right: 40px;"
-        "color: #818cf8;"
-        "font-weight: 500;"
+        "color: #6366f1;"  # Giữ màu xanh tím nhấn nhá
+        "font-weight: 600;"
         "font-size: 0.78rem;"
         "}"
         "@keyframes marquee-scroll {"
